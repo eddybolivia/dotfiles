@@ -1,0 +1,9 @@
+[user]
+    name = Eduardo Garcia
+    email = eddybolivia@gmail.com
+[init]
+    defaultBranch = main
+[pull]
+    rebase = true
+[url "git@github.com:"]
+    insteadOf = https://github.com/

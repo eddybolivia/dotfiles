@@ -1,0 +1,78 @@
+# Path to your oh-my-zsh installation.
+export ZSH=$HOME/.oh-my-zsh
+
+# --- TEMA ---
+ZSH_THEME="intheloop"
+
+# --- MENÚ DE NAVEGACIÓN VISUAL ---
+
+# 1. Activa el menú de selección (Tab para entrar, flechas para moverse)
+zstyle ':completion:*' menu select
+
+# 2. Ignora mayúsculas/minúsculas y permite completar partes de palabras
+zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}' 'r:|[._-]=* r:|=*'
+
+# 3. Colorea el menú usando los mismos colores que tu comando 'ls'
+zstyle ':completion:*' list-colors "${(s.:.)LS_COLORS}"
+
+# 4. Inicializa el sistema de completado (Vital)
+autoload -Uz compinit && compinit
+
+# --- PLUGINS ---
+plugins=(
+  git 
+  dotenv 
+  docker 
+  docker-compose 
+  kubectl 
+  zsh-autosuggestions 
+  zsh-syntax-highlighting
+)
+
+ZSH_DOTENV_PROMPT=false
+
+source $ZSH/oh-my-zsh.sh
+
+# --- PATH Y VARIABLES ---
+export PATH=$HOME/.local/bin:/snap/bin:$HOME/.local/share/mise/shims:$PATH
+export EDITOR="nvim"
+export SUDO_EDITOR="$EDITOR"
+export ELECTRON_OZONE_PLATFORM_HINT="wayland"
+export PNPM_HOME=$HOME/.local/share/pnpm
+[[ ":$PATH:" != *":$PNPM_HOME:"* ]] && export PATH="$PNPM_HOME:$PATH"
+
+# --- HERRAMIENTAS (Mise, GCloud, Starship, Zoxide) ---
+if command -v mise &> /dev/null; then eval "$(mise activate zsh)"; fi
+[ -f '/home/luis/dev/google-cloud-sdk/path.zsh.inc' ] && . '/home/luis/dev/google-cloud-sdk/path.zsh.inc'
+[ -f '/home/luis/dev/google-cloud-sdk/completion.zsh.inc' ] && . '/home/luis/dev/google-cloud-sdk/completion.zsh.inc'
+eval "$(starship init zsh)"
+eval "$(zoxide init zsh)"
+
+# --- FZF: EL BUSCADOR DE CRISTAL (Ctrl+R) ---
+# 1. Colores sincronizados con Firefox y tu Verde Elegante
+export FZF_DEFAULT_OPTS="--color='bg+:#282c34,bg:#121317,spinner:#98c379,hl:#e5c07b,fg:#abb2bf,header:#e06c75,info:#c678dd,pointer:#98c379,marker:#98c379,fg+:#dcdccc,prompt:#98c379,hl+:#98c379,border:#1e222a,scrollbar:#5c6370' --border --height 40% --layout=reverse --prompt='󰄾 ' --pointer='❯' --marker='󰄵 ' --no-info"
+
+# 2. Cargar binarios y forzar el atajo de teclado
+source /usr/share/fzf/key-bindings.zsh
+source /usr/share/fzf/completion.zsh
+bindkey '^R' fzf-history-widget
+
+# --- SINTAXIS: COLORES ELEGANTES ---
+source /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+
+ZSH_HIGHLIGHT_STYLES[command]='fg=#98c379,bold'      # Tu verde elegante
+ZSH_HIGHLIGHT_STYLES[alias]='fg=#98c379,bold'        # Alias en verde
+ZSH_HIGHLIGHT_STYLES[arg0]='fg=#abb2bf'              # Argumentos gris suave
+ZSH_HIGHLIGHT_STYLES[default]='fg=#abb2bf'
+ZSH_HIGHLIGHT_STYLES[path]='fg=#61afef,underline'    # Rutas en azul
+ZSH_HIGHLIGHT_STYLES[unknown-token]='fg=#e06c75'     # Errores en rojo
+
+# --- FUNCIONES ---
+gitlog () {
+  local lines=${1:-15}
+  git log -$lines --oneline --decorate --color --graph | cat
+}
+
+# Fast Node Manager (fnm)
+eval "$(fnm env --use-on-cd)"
+
